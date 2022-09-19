@@ -2,7 +2,7 @@ import SpeechRecognition, {
     useSpeechRecognition,
 } from 'react-speech-recognition';
 import { post, get } from './sendRequest';
-import { Button, Badge, Form } from 'react-bootstrap';
+import { Button, Badge, Form, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './App.module.scss';
 import { useEffect, useState } from 'react';
@@ -17,6 +17,7 @@ function App() {
     const [voices, setVoices] = useState<Voice[]>([]);
     const [voice, setVoice] = useState('');
     const [audioUrl, setAudioUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
@@ -31,7 +32,10 @@ function App() {
     }, []);
 
     const handleStart = () => {
-        SpeechRecognition.startListening({ continuous: true, language: 'en-EN' });
+        SpeechRecognition.startListening({
+            continuous: true,
+            language: 'en-EN',
+        });
     };
 
     const handleStop = () => {
@@ -39,6 +43,8 @@ function App() {
     };
 
     const sendText = () => {
+        setIsLoading(true);
+
         return post({
             url: 'http://localhost:8000/voice',
             data: { text, voice },
@@ -49,7 +55,10 @@ function App() {
                 // mode: 'no-cors'
             },
         })
-            .then((data) => setAudioUrl(data.path))
+            .then((data) => {
+                setAudioUrl(data.path);
+                setIsLoading(false);
+            })
             .catch((err) => console.error(err));
     };
 
@@ -119,7 +128,17 @@ function App() {
                 />
             </div>
             <Button onClick={sendText} className={styles.send}>
-                Send text
+                {isLoading ? (
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                ) : (
+                    'Send text'
+                )}
             </Button>
             {audioUrl && (
                 <audio controls>

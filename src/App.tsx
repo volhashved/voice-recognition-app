@@ -31,7 +31,7 @@ function App() {
     }, []);
 
     const handleStart = () => {
-        SpeechRecognition.startListening({ continuous: true });
+        SpeechRecognition.startListening({ continuous: true, language: 'en-EN' });
     };
 
     const handleStop = () => {

@@ -70,6 +70,12 @@ function App() {
         setVoice(e.target.value);
     };
 
+    const handleReset = () => {
+        resetTranscript()
+        setAudioUrl('')
+        setText('')
+    }
+
     return (
         <div className={styles.App}>
             <div className={styles.leftWindow}>
@@ -99,7 +105,7 @@ function App() {
                         </Button>
                         <Button
                             variant="warning"
-                            onClick={resetTranscript}
+                            onClick={handleReset}
                             className={styles.button}
                         >
                             Reset

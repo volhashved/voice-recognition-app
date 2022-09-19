@@ -18,6 +18,7 @@ function App() {
     const [voice, setVoice] = useState('');
     const [audioUrl, setAudioUrl] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [dropdownLoading, setDropdownLoading] = useState(false);
 
     const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
@@ -26,9 +27,11 @@ function App() {
     }, [transcript]);
 
     useEffect(() => {
-        get('http://localhost:8000/voice/voice-model').then((data) =>
-            setVoices(data)
-        );
+        setDropdownLoading(true);
+        get('http://localhost:8000/voice/voice-model').then((data) => {
+            setVoices(data);
+            setDropdownLoading(false);
+        });
     }, []);
 
     const handleStart = () => {
@@ -59,7 +62,10 @@ function App() {
                 setAudioUrl(data.path);
                 setIsLoading(false);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                console.error(err)
+                setIsLoading(false)
+            });
     };
 
     const changeText = (e: any) => {
@@ -71,10 +77,10 @@ function App() {
     };
 
     const handleReset = () => {
-        resetTranscript()
-        setAudioUrl('')
-        setText('')
-    }
+        resetTranscript();
+        setAudioUrl('');
+        setText('');
+    };
 
     return (
         <div className={styles.App}>
@@ -117,6 +123,13 @@ function App() {
                         className={styles.dropdown}
                         onChange={selectVoice}
                     >
+                        <option>
+                            {dropdownLoading ? 
+                                'Loading...' : (
+                                'Please, select a voice'
+                            )}
+                        </option>
+
                         {voices.map(({ label, value }, index) => (
                             <option key={label + index} value={value}>
                                 {label}
